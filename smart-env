@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# smart-env - RT-Smart Build Environment Setup Script
+# Usage: source smart-env [build_dir]
+
+if [ -n "$BASH_SOURCE" ]; then
+    THIS_SCRIPT=$BASH_SOURCE
+elif [ -n "$ZSH_NAME" ]; then
+    THIS_SCRIPT=$0
+else
+    THIS_SCRIPT="$(pwd)/smart-env"
+fi
+
+if [ -n "$BBSERVER" ]; then
+    unset BBSERVER
+fi
+
+SMART_BUILD_ROOT=$(cd $(dirname $THIS_SCRIPT) && pwd)
+BUILD_DIR=${1:-build}
+
+# 创建构建目录
+if [ ! -d "$BUILD_DIR" ]; then
+    mkdir -p "$BUILD_DIR/conf"
+    echo "Created build directory: $BUILD_DIR"
+fi
+
+# 设置环境变量
+export SMART_BUILD_ROOT
+export BBPATH="$SMART_BUILD_ROOT/meta-rt-smart"
+export BB_ENV_PASSTHROUGH_ADDITIONS="SMART_BUILD_ROOT MACHINE DISTRO"
+export PATH="$SMART_BUILD_ROOT/bitbake/bin:$PATH"
+
+cd "$BUILD_DIR"
+
+# 创建 local.conf
+if [ ! -f conf/local.conf ]; then
+    cat > conf/local.conf << 'EOF'
+# RT-Smart Build Configuration
+#
+# Machine Selection
+MACHINE ??= "qemuarm64"
+
+# Distribution Selection  
+DISTRO ?= "smart"
+
+# Build directories
+TMPDIR = "${TOPDIR}/tmp"
+DL_DIR ?= "${TOPDIR}/downloads"
+SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
+
+# Parallelism Options
+BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
+PARALLEL_MAKE ?= "-j ${@oe.utils.cpu_count()}"
+
+# Package Management
+PACKAGE_CLASSES ?= "package_tar"
+
+# Additional settings
+USER_CLASSES ?= "buildstats"
+PATCHRESOLVE = "noop"
+
+# QA checks
+WARN_QA = "textrel files-invalid incompatible-license xorg-driver-abi buildpaths"
+ERROR_QA = "dev-so debug-deps dev-deps debug-files arch pkgconfig la perms useless-rpaths rpaths staticdev ldflags pkgvarcheck already-stripped compile-host-path install-host-path pn-overrides infodir build-deps file-rdeps version-going-backwards host-user-contaminated uppercase-pn patch-fuzz-warning"
+EOF
+    echo "Created conf/local.conf"
+fi
+
+# 创建 bblayers.conf
+if [ ! -f conf/bblayers.conf ]; then
+    cat > conf/bblayers.conf << EOF
+# Layer Configuration
+POKY_BBLAYERS_CONF_VERSION = "2"
+
+BBPATH = "\${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \\
+  $SMART_BUILD_ROOT/meta-rt-smart \\
+"
+EOF
+    echo "Created conf/bblayers.conf"
+fi
+
+echo ""
+echo "### RT-Smart Build Environment Ready ###"
+echo ""
+echo "Build Configuration:"
+echo "  Build Directory: $(pwd)"
+echo "  Machine: ${MACHINE:-qemuarm64}"
+echo "  Distribution: ${DISTRO:-smart}"
+echo ""
+echo "Common build targets:"
+echo "  bitbake smart-gcc -c install_toolchain"
+echo "  bitbake busybox -c build_rootfs"  
+echo "  bitbake rt-smart -c build_kernel"
+echo "  bitbake rt-smart -c build_all"
+echo "" 

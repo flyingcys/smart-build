@@ -1,0 +1,16 @@
+9469 21:41:06.097840 --- Starting bitbake server pid 9469 at 2025-06-07 21:41:06.097663 ---
+9469 21:41:06.122517 Started bitbake server pid 9469
+9469 21:41:06.125424 Entering server connection loop
+9469 21:41:06.125895 Lockfile is: /home/share/samba/smart-build/test-build6/bitbake.lock
+Socket is /home/share/samba/smart-build/test-build6/bitbake.sock (True)
+9469 21:41:06.131057 Accepting [<socket.socket fd=4, family=AddressFamily.AF_UNIX, type=SocketKind.SOCK_STREAM, proto=0, laddr=bitbake.sock>] ([])
+9469 21:41:06.139938 Processing Client
+9469 21:41:06.140682 Connecting Client
+9469 21:41:06.146327 Running command ['setFeatures', [2, 1]]
+9469 21:41:06.147248 Sending reply (None, None)
+9469 21:41:06.149019 Command Completed (socket: True)
+9469 21:41:06.262251 Processing Client
+9469 21:41:06.262466 Disconnecting Client (socket: True)
+9469 21:41:06.265116 No timeout, exiting.
+9469 21:41:07.270753 Exiting (socket: True)
+9469 21:41:07.274144 Exiting as we could obtain the lock
