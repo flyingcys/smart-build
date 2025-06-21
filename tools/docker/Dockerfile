@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y sudo locales language-pack-en-base bash
     && locale-gen en_US.UTF-8 \
     && echo "${USER_NAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && apt-get install -y chrpath cpio diffstat gawk lz4 wget zstd qemu-system-arm \
-    && pip install requests scons kconfiglib tqdm --break-system-packages
+    && pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --timeout 300 requests scons kconfiglib tqdm --break-system-packages
 
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
